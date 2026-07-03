@@ -1,0 +1,50 @@
+import React, { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+
+export default function CustomCursor() {
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const [cursorSize, setCursorSize] = useState(32);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      setCursorPosition({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseOverText = () => setCursorSize(80);
+    const handleMouseLeaveText = () => setCursorSize(32);
+
+    const textElements = document.querySelectorAll("p, h1, h2, h3, h4, h5, h6");
+    textElements.forEach((el) => {
+      el.addEventListener("mouseenter", handleMouseOverText);
+      el.addEventListener("mouseleave", handleMouseLeaveText);
+    });
+
+    window.addEventListener("mousemove", handleMouseMove);
+
+    return () => {
+      textElements.forEach((el) => {
+        el.removeEventListener("mouseenter", handleMouseOverText);
+        el.removeEventListener("mouseleave", handleMouseLeaveText);
+      });
+      window.removeEventListener("mousemove", handleMouseMove);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      className="fixed rounded-full pointer-events-none z-50"
+      style={{
+        width: cursorSize,
+        height: cursorSize,
+        backgroundColor: "rgba(6, 182, 212, 0.15)",
+        border: "1px solid rgba(6, 182, 212, 0.3)",
+        mixBlendMode: "difference",
+      }}
+      animate={{
+        x: cursorPosition.x - cursorSize / 2,
+        y: cursorPosition.y - cursorSize / 2,
+      }}
+      transition={{ type: "spring", stiffness: 200, damping: 20 }}
+    />
+  );
+}
